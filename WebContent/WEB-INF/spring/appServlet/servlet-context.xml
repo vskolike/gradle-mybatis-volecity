@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:context="http://www.springframework.org/schema/context"   
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd "> 
+        
+    <bean id="configRealm" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+          <property name="locations">
+             <list>
+                 <value>classpath:conf/jdbc.properties</value>
+             </list>
+         </property>
+    </bean>
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+         <property name="properties" ref="configRealm"/>
+    </bean>
+        
+    <!-- scan for bean and let them be autowired -->
+	<context:component-scan base-package="org.gradle.**.service" />
+    <context:component-scan base-package="org.gradle.controllers" /> 
+        
+    <!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->  
+  
+    <!-- Enables the Spring MVC @Controller programming model -->  
+    <mvc:annotation-driven />  
+    
+    <!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->  
+    <mvc:resources mapping="/resources/**" location="/resources/" /> 
+    
+    <!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory  
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" > 
+        <property name="prefix" value="/WEB-INF/views/" />  
+        <property name="suffix" value=".html" />
+    </bean> 
+    --> 
+    <!-- velocity 配置 -->
+	<bean id="velocityConfig"
+		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath">
+			<value>/WEB-INF/views/</value>
+		</property>
+
+		<property name="velocityProperties">
+			<props>
+				<prop key="input.encoding">UTF-8</prop>
+				<prop key="output.encoding">UTF-8</prop>
+				<prop key="contentType">text/html;charset=UTF-8</prop>
+
+				<prop key="file.resource.loader.cache">false</prop>
+				<prop key="file.resource.loader.modificationCheckInterval">1</prop>
+				<prop key="velocimacro.library.autoreload">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+		<property name="suffix" value=".html" />
+
+		<!-- 使用springMacro、使用servlet的对象 -->
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="exposeRequestAttributes" value="true" />
+		<property name="exposeSessionAttributes" value="true" />
+		<property name="requestContextAttribute" value="rc" />
+
+		<property name="contentType" value="text/html;charset=UTF-8" />
+	</bean>
+	<!--// velocity 配置 -->
+    
+    <import resource="classpath*:conf/spring/*.xml" />
+        
+</beans>
